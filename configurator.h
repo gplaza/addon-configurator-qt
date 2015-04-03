@@ -67,6 +67,7 @@ private:
 public:
     bool setDB(const QString &path, bool cache);
     QString getConfig(const QString &key);
+    void addConfig(const QString &key,const QString &value);
     QMap<QString,QString> getConfigs(QSet<QString> keys);
 
 private slots:

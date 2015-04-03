@@ -158,6 +158,11 @@ void Configurator::setConfig(const QByteArray &config)
     }
 }
 
+void Configurator::addConfig(const QString &key,const QString &value)
+{
+    configs.insert(key,value);
+}
+
 bool Configurator::checkDatabaseFile(const QString &basePath)
 {
     QFile databaseFile(basePath);
