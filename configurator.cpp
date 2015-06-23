@@ -20,7 +20,7 @@ bool Configurator::setDB(const QString &path,bool cache)
     if(this->cache)
     {
         qDebug() << "Init API server";
-         initServer();
+        initServer();
     }
 
     return true;
@@ -53,9 +53,25 @@ QMap<QString,QString> Configurator::getConfigs(QSet<QString> keys)
         QString key = query.value(0).toString();
         QString value = query.value(1).toString();
         result.insert(key,value);
+
+        if(cache && !configs.contains(key))
+            configs.insert(key,value);
     }
 
     return result;
+}
+
+void Configurator::getCacheConfigToDebug() {
+
+    if(cache)
+    {
+        QMapIterator<QString,QString> i(configs);
+
+        while (i.hasNext()) {
+            i.next();
+            qDebug() << i.key().leftJustified(30,' ') + " : " << i.value();
+        }
+    }
 }
 
 void Configurator::handleRequest(QHttpRequest* req, QHttpResponse* resp)

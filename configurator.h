@@ -69,6 +69,7 @@ public:
     QString getConfig(const QString &key);
     void addConfig(const QString &key,const QString &value);
     QMap<QString,QString> getConfigs(QSet<QString> keys);
+    void getCacheConfigToDebug();
 
 private slots:
     void handleRequest(QHttpRequest* req, QHttpResponse* resp);
