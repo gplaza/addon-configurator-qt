@@ -126,13 +126,15 @@ QString Configurator::getConfig(const QString &key)
 
     if(cache && configs.contains(key))
     {
+#ifdef QT_DEBUG
         qDebug() << "Return key ("+key+") from cache " << configs[key];
+#endif
         return configs[key];
 
     } else {
-
+#ifdef QT_DEBUG
         qDebug() << "Key ("+key+") not in cache";
-
+#endif
         QString sql = "SELECT value FROM config WHERE key=:key LIMIT 1";
         query.prepare(sql);
         query.bindValue(":key", key);
