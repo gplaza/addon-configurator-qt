@@ -2,9 +2,10 @@
 
 Configurator* Configurator::m_Instance = 0;
 
-bool Configurator::setDB(const QString &path,bool cache)
+bool Configurator::init(const QString &path, bool cache, qint16 port)
 {
     this->cache = cache;
+    this->port = port;
     bool newConfigDB = checkDatabaseFile(path);
 
     if(!newConfigDB)
@@ -30,7 +31,7 @@ void Configurator::initServer()
 {
     QHttpServer *server = new QHttpServer(this);
     connect(server, &QHttpServer::newRequest, this, &Configurator::handleRequest);
-    server->listen(QHostAddress::Any, 8080);
+    server->listen(QHostAddress::Any, this->port);
 }
 
 QMap<QString,QString> Configurator::getConfigs(QSet<QString> keys)
