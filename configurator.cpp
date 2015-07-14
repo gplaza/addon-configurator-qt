@@ -20,7 +20,7 @@ bool Configurator::init(const QString &path, bool cache, qint16 port)
 
     if(this->cache)
     {
-        qDebug() << "Init API server";
+        qDebug() << "Init API server on port" << QString::number(port);
         initServer();
     }
 

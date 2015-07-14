@@ -31,11 +31,6 @@ public:
             if (!m_Instance)
             {
                 m_Instance = new Configurator;
-
-                //QHttpServer *server = new QHttpServer(m_Instance);
-                //connect(server, &QHttpServer::newRequest, m_Instance, &Configurator::handleRequest);
-                //connect(req,&QHttpRequest::data,m_Instance,&Configurator::setConfig);
-                //server->listen(QHostAddress::Any, 8080);
             }
 
             mutex.unlock();
@@ -65,7 +60,9 @@ private:
     qint16 port;
 
 public:
-    bool init(const QString &path, bool cache = true, quint16 port = 8080);
+    //bool initConfigurator(const QString &path, bool cache = true, quint16 port = 8080);
+    bool init(const QString &path, bool cache = true, qint16 port = 8080);
+
     QString getConfig(const QString &key);
     void addConfig(const QString &key,const QString &value);
     QMap<QString,QString> getConfigs(QSet<QString> keys);
