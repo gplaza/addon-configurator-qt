@@ -2,10 +2,11 @@
 
 Configurator* Configurator::m_Instance = 0;
 
-bool Configurator::init(const QString &path, bool cache, qint16 port)
+bool Configurator::init(const QString &path, bool cache, quint16 port)
 {
     this->cache = cache;
     this->port = port;
+
     bool newConfigDB = checkDatabaseFile(path);
 
     if(!newConfigDB)
@@ -20,7 +21,7 @@ bool Configurator::init(const QString &path, bool cache, qint16 port)
 
     if(this->cache)
     {
-        qDebug() << "Init API server on port" << QString::number(port);
+        qDebug() << "Init API server";
         initServer();
     }
 
@@ -32,34 +33,6 @@ void Configurator::initServer()
     QHttpServer *server = new QHttpServer(this);
     connect(server, &QHttpServer::newRequest, this, &Configurator::handleRequest);
     server->listen(QHostAddress::Any, this->port);
-}
-
-QMap<QString,QString> Configurator::getConfigs(QSet<QString> keys)
-{
-    QSqlQuery query(QSqlDatabase::database("config"));
-    QMap <QString,QString> result;
-    QStringList keysString;
-
-    QString sql = "SELECT key, value FROM config WHERE ";
-
-    foreach (QString key, keys)
-        keysString << " key = '" + key + "'";
-
-    sql += keysString.join(" OR ");
-
-    if (!query.exec(sql))
-        qCritical() << "Query Error (getConfigs) : " << query.lastError();
-
-    while(query.next()) {
-        QString key = query.value(0).toString();
-        QString value = query.value(1).toString();
-        result.insert(key,value);
-
-        if(cache && !configs.contains(key))
-            configs.insert(key,value);
-    }
-
-    return result;
 }
 
 void Configurator::getCacheConfigToDebug() {
@@ -121,6 +94,34 @@ void Configurator::handleRequest(QHttpRequest* req, QHttpResponse* resp)
     }
 }
 
+QMap<QString,QString> Configurator::getConfigs(QSet<QString> keys)
+{
+    QSqlQuery query(QSqlDatabase::database("config"));
+    QMap <QString,QString> result;
+    QStringList keysString;
+
+    QString sql = "SELECT key, value FROM config WHERE ";
+
+    foreach (QString key, keys)
+        keysString << " key = '" + key + "'";
+
+    sql += keysString.join(" OR ");
+
+    if (!query.exec(sql))
+        qCritical() << "Query Error (getConfigs) : " << query.lastError();
+
+    while(query.next()) {
+        QString key = query.value(0).toString();
+        QString value = query.value(1).toString();
+        result.insert(key,value);
+
+        if(cache && !configs.contains(key))
+            configs.insert(key,value);
+    }
+
+    return result;
+}
+
 QString Configurator::getConfig(const QString &key)
 {
     QSqlQuery query(QSqlDatabase::database("config"));
@@ -174,6 +175,27 @@ void Configurator::setConfig(const QByteArray &config)
 
             configs.insert(key,value);
         }
+
+        emit configurationChanged();
+    }
+}
+
+void Configurator::setConfigByKey(const QString &key,const QString &value)
+{
+    QSqlQuery query(QSqlDatabase::database("config"));
+
+    QString sql = "UPDATE config SET value=:value WHERE key=:key;";
+    query.prepare(sql);
+    query.bindValue(":key", key);
+    query.bindValue(":value", value);
+
+    if (!query.exec())
+    {
+        qCritical() << "Query Error (setConfigByKey) : " << query.lastError();
+
+    } else {
+        configs.insert(key,value);
+        emit configurationChanged();
     }
 }
 

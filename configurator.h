@@ -29,9 +29,7 @@ public:
             mutex.lock();
 
             if (!m_Instance)
-            {
                 m_Instance = new Configurator;
-            }
 
             mutex.unlock();
         }
@@ -57,13 +55,12 @@ private:
     void initServer();
     QMap<QString,QString> configs;
     bool cache;
-    qint16 port;
+    quint16 port;
 
 public:
-    //bool initConfigurator(const QString &path, bool cache = true, quint16 port = 8080);
-    bool init(const QString &path, bool cache = true, qint16 port = 8080);
-
+    bool init(const QString &path, bool cache = true, quint16 port = 8080);
     QString getConfig(const QString &key);
+    void setConfigByKey(const QString &key,const QString &value);
     void addConfig(const QString &key,const QString &value);
     QMap<QString,QString> getConfigs(QSet<QString> keys);
     void getCacheConfigToDebug();
@@ -74,6 +71,7 @@ private slots:
 
 signals:
     void callServer(QHttpRequest* req, QHttpResponse* resp);
+    void configurationChanged();
 
 };
 
